@@ -21,6 +21,8 @@ defmodule IncidentManagementPlatform.Orgs do
   alias IncidentManagementPlatform.Repo
   alias IncidentManagementPlatform.Orgs.{Organization, OrganizationMembership, Service, Team}
 
+  @type role :: :admin | :responder | :viewer
+
   @doc "List organizations the current user belongs to."
   def list_organizations(%Scope{user: user}) when not is_nil(user) do
     Organization
@@ -89,12 +91,73 @@ defmodule IncidentManagementPlatform.Orgs do
     Service
     |> where([s], s.organization_id == ^organization_id)
     |> maybe_where_team(team_id)
+    |> preload([s], [:team])
     |> order_by([s], asc: s.name)
     |> Repo.all()
   end
 
+  @doc "Create a service within an organization. Requires :admin role."
+  def create_service(scope, organization_id, attrs) do
+    membership = get_membership!(scope, organization_id)
+
+    if membership.role != :admin do
+      {:error, :forbidden}
+    else
+      with {:ok, team_id} <- cast_int(Map.get(attrs, "team_id")),
+           %Team{} = team <- Repo.get_by(Team, id: team_id, organization_id: organization_id) do
+        integration_key = generate_integration_key()
+
+        case(
+          %Service{organization_id: organization_id, team_id: team.id}
+          |> Service.changeset(Map.put(attrs, "integration_key", integration_key))
+          |> Repo.insert()
+        ) do
+          {:ok, service} -> {:ok, Repo.preload(service, :team)}
+          other -> other
+        end
+      else
+        :error -> {:error, :invalid_team}
+        nil -> {:error, :invalid_team}
+      end
+    end
+  end
+
+  @doc "Get the user's role within an organization (or nil if no membership)."
+  @spec get_role(Scope.t(), Ecto.UUID.t() | pos_integer() | binary()) :: role() | nil
+  def get_role(%Scope{} = scope, organization_id) do
+    case get_membership(scope, organization_id) do
+      %OrganizationMembership{role: role} -> role
+      nil -> nil
+    end
+  end
+
+  def get_role(_scope, _organization_id), do: nil
+
   defp maybe_where_team(query, nil), do: query
   defp maybe_where_team(query, team_id), do: where(query, [s], s.team_id == ^team_id)
+
+  defp cast_int(nil), do: :error
+
+  defp cast_int(val) when is_integer(val), do: {:ok, val}
+
+  defp cast_int(val) when is_binary(val) do
+    case Integer.parse(val) do
+      {i, ""} -> {:ok, i}
+      _ -> :error
+    end
+  end
+
+  defp generate_integration_key do
+    32
+    |> :crypto.strong_rand_bytes()
+    |> Base.url_encode64(padding: false)
+  end
+
+  defp get_membership(%Scope{user: user}, organization_id) when not is_nil(user) do
+    Repo.get_by(OrganizationMembership, organization_id: organization_id, user_id: user.id)
+  end
+
+  defp get_membership(_scope, _organization_id), do: nil
 
   defp get_membership!(%Scope{user: user}, organization_id) when not is_nil(user) do
     Repo.get_by!(OrganizationMembership, organization_id: organization_id, user_id: user.id)

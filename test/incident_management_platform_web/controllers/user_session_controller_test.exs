@@ -18,10 +18,10 @@ defmodule IncidentManagementPlatformWeb.UserSessionControllerTest do
         })
 
       assert get_session(conn, :user_token)
-        assert redirected_to(conn) == ~p"/"
+      assert redirected_to(conn) == ~p"/"
 
       # Now do a logged in request and assert on the menu
-        conn = get(conn, ~p"/orgs")
+      conn = get(conn, ~p"/orgs")
       response = html_response(conn, 200)
       assert response =~ user.email
       assert response =~ ~p"/users/settings"
@@ -82,10 +82,10 @@ defmodule IncidentManagementPlatformWeb.UserSessionControllerTest do
         })
 
       assert get_session(conn, :user_token)
-        assert redirected_to(conn) == ~p"/"
+      assert redirected_to(conn) == ~p"/"
 
       # Now do a logged in request and assert on the menu
-        conn = get(conn, ~p"/orgs")
+      conn = get(conn, ~p"/orgs")
       response = html_response(conn, 200)
       assert response =~ user.email
       assert response =~ ~p"/users/settings"
@@ -103,7 +103,7 @@ defmodule IncidentManagementPlatformWeb.UserSessionControllerTest do
         })
 
       assert get_session(conn, :user_token)
-        assert redirected_to(conn) == ~p"/"
+      assert redirected_to(conn) == ~p"/"
       assert Phoenix.Flash.get(conn.assigns.flash, :info) =~ "User confirmed successfully."
 
       assert Accounts.get_user!(user.id).confirmed_at

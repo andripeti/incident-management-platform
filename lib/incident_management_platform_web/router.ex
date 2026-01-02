@@ -55,11 +55,20 @@ defmodule IncidentManagementPlatformWeb.Router do
       live "/orgs", OrgLive.Index, :index
       live "/orgs/:id", OrgLive.Show, :show
 
+      live "/orgs/:org_id/incidents", IncidentLive.Index, :index
+      live "/orgs/:org_id/incidents/:id", IncidentLive.Show, :show
+
       live "/users/settings", UserLive.Settings, :edit
       live "/users/settings/confirm-email/:token", UserLive.Settings, :confirm_email
     end
 
     post "/users/update-password", UserSessionController, :update_password
+  end
+
+  scope "/api/v1", IncidentManagementPlatformWeb do
+    pipe_through :api
+
+    post "/incidents/trigger", IncidentWebhookController, :trigger
   end
 
   scope "/", IncidentManagementPlatformWeb do
