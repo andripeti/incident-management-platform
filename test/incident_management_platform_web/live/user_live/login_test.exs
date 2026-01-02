@@ -28,7 +28,9 @@ defmodule IncidentManagementPlatformWeb.UserLive.LoginTest do
       assert html =~ "If your email is in our system"
 
       assert IncidentManagementPlatform.Repo.get_by!(
-               IncidentManagementPlatform.Accounts.UserToken, user_id: user.id).context ==
+               IncidentManagementPlatform.Accounts.UserToken,
+               user_id: user.id
+             ).context ==
                "login"
     end
 

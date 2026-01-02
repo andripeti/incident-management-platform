@@ -1,0 +1,42 @@
+services:
+  db:
+    image: postgres:16
+    container_name: imp-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: incident_management_platform_dev
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d incident_management_platform_dev"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: imp-web
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PHX_DOCKER: "true"
+      POSTGRES_HOST: db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: incident_management_platform_dev
+    ports:
+      - "4000:4000"
+    volumes:
+      - .:/app
+      - deps:/app/deps
+      - _build:/app/_build
+    command: ["bash", "-lc", "bash ./docker/dev/entrypoint.sh"]
+
+volumes:
+  postgres_data:
+  deps:
+  _build:

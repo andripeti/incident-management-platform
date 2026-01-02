@@ -1,5 +1,24 @@
 # IncidentManagementPlatform
 
+## Run locally (Docker)
+
+Prereqs:
+- Docker Desktop (or Docker Engine) with `docker compose` available
+
+Start the app (Phoenix + Postgres):
+
+- `docker compose up --build`
+
+Then visit:
+- http://localhost:4000/users/register
+- Dev mailbox (confirmation emails): http://localhost:4000/dev/mailbox
+
+Stop everything:
+- `docker compose down`
+
+Windows shortcut:
+- `./scripts/dev.ps1`
+
 To start your Phoenix server:
 
 * Run `mix setup` to install and setup dependencies

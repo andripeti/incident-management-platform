@@ -1,11 +1,18 @@
 import Config
 
+postgres_user = System.get_env("POSTGRES_USER") || "postgres"
+postgres_password = System.get_env("POSTGRES_PASSWORD") || "postgres"
+postgres_host = System.get_env("POSTGRES_HOST") || "localhost"
+postgres_db = System.get_env("POSTGRES_DB") || "incident_management_platform_dev"
+
+bind_ip = if System.get_env("PHX_DOCKER") == "true", do: {0, 0, 0, 0}, else: {127, 0, 0, 1}
+
 # Configure your database
 config :incident_management_platform, IncidentManagementPlatform.Repo,
-  username: "postgres",
-  password: "postgres",
-  hostname: "localhost",
-  database: "incident_management_platform_dev",
+  username: postgres_user,
+  password: postgres_password,
+  hostname: postgres_host,
+  database: postgres_db,
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,
   pool_size: 10
@@ -19,7 +26,7 @@ config :incident_management_platform, IncidentManagementPlatform.Repo,
 config :incident_management_platform, IncidentManagementPlatformWeb.Endpoint,
   # Binding to loopback ipv4 address prevents access from other machines.
   # Change to `ip: {0, 0, 0, 0}` to allow access from other machines.
-  http: [ip: {127, 0, 0, 1}],
+  http: [ip: bind_ip],
   check_origin: false,
   code_reloader: true,
   debug_errors: true,
