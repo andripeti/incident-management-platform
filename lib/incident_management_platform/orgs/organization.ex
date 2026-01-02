@@ -8,6 +8,7 @@ defmodule IncidentManagementPlatform.Orgs.Organization do
     field :name, :string
     field :slug, :string
 
+    has_many :memberships, IncidentManagementPlatform.Orgs.OrganizationMembership
     has_many :teams, IncidentManagementPlatform.Orgs.Team
     has_many :services, IncidentManagementPlatform.Orgs.Service
 

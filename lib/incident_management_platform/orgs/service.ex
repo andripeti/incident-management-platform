@@ -17,8 +17,8 @@ defmodule IncidentManagementPlatform.Orgs.Service do
 
   def changeset(service, attrs) do
     service
-    |> cast(attrs, [:organization_id, :team_id, :name, :slug, :integration_key])
-    |> validate_required([:organization_id, :team_id, :name, :slug, :integration_key])
+    |> cast(attrs, [:name, :slug, :integration_key])
+    |> validate_required([:name, :slug, :integration_key])
     |> validate_length(:name, min: 2, max: 120)
     |> validate_format(:slug, ~r/^[a-z0-9]+(?:-[a-z0-9]+)*$/)
     |> foreign_key_constraint(:organization_id)

@@ -9,6 +9,8 @@ defmodule IncidentManagementPlatform.Accounts.User do
     field :confirmed_at, :utc_datetime
     field :authenticated_at, :utc_datetime, virtual: true
 
+    has_many :organization_memberships, IncidentManagementPlatform.Orgs.OrganizationMembership
+
     timestamps(type: :utc_datetime)
   end
 

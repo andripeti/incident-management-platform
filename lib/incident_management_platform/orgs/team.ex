@@ -16,8 +16,8 @@ defmodule IncidentManagementPlatform.Orgs.Team do
 
   def changeset(team, attrs) do
     team
-    |> cast(attrs, [:organization_id, :name, :slug])
-    |> validate_required([:organization_id, :name, :slug])
+    |> cast(attrs, [:name, :slug])
+    |> validate_required([:name, :slug])
     |> validate_length(:name, min: 2, max: 120)
     |> validate_format(:slug, ~r/^[a-z0-9]+(?:-[a-z0-9]+)*$/)
     |> foreign_key_constraint(:organization_id)
